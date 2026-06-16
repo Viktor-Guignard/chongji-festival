@@ -291,6 +291,26 @@ input,textarea{font-family:inherit}
 .tkt .qty button{width:38px;height:38px;border:1.5px solid var(--ink);font-family:var(--mono);font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;color:var(--ink)}
 .tkt .qty button:active{background:var(--ink);color:var(--bone)}
 .tkt .qty b{font-family:var(--display);width:34px;text-align:center;font-size:19px;font-weight:400}
+.tkt{cursor:pointer;transition:transform .15s,box-shadow .25s,outline-color .2s}
+.tkt:active{transform:scale(.992)}
+.tkt.sel{outline:3px solid var(--ink);outline-offset:-3px;box-shadow:0 14px 34px rgba(10,10,11,.32)}
+.tkt .addhint{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);
+  display:inline-flex;align-items:center;gap:7px;margin-top:2px}
+.tkt .addhint::before{content:'+';display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;
+  border:1.5px solid var(--red);border-radius:50%;font-size:13px;line-height:1}
+.tkt.sel .addhint{color:var(--ink)}
+.tkt.sel .addhint::before{content:'✓';border-color:var(--ink);background:var(--ink);color:var(--bone)}
+/* barre panier flottante */
+#cartbar{position:fixed;left:14px;right:14px;bottom:calc(var(--tabbar-h) + 12px);z-index:70;max-width:492px;margin:0 auto;
+  background:var(--ink);color:var(--bone);display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:13px 14px 13px 18px;box-shadow:0 16px 40px rgba(10,10,11,.45);
+  transform:translateY(180%);opacity:0;transition:transform .42s var(--ease-hit),opacity .3s;pointer-events:none}
+#cartbar.show{transform:none;opacity:1;pointer-events:auto}
+#cartbar .sum{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4}
+#cartbar .sum b{color:var(--red);font-weight:600;font-size:14px}
+#cartbar button{background:var(--red);color:var(--bone);font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;padding:13px 16px;flex:none;transition:transform .15s}
+#cartbar button:active{transform:scale(.96)}
 
 /* checkout */
 .checkout{background:var(--ink);color:var(--bone);padding:24px 20px;margin-top:8px}
@@ -367,6 +387,15 @@ input,textarea{font-family:inherit}
 .appfoot{padding:30px 20px calc(var(--tabbar-h));text-align:center;border-top:1px solid rgba(10,10,11,.1);margin-top:10px}
 .appfoot .f-logo{font-family:var(--display);font-size:26px;display:inline-flex;align-items:baseline;gap:.3em;margin-bottom:12px}
 .appfoot p{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--grey);text-transform:uppercase;line-height:1.8}
+.foot-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:18px 0 22px}
+.foot-nav button{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);
+  border:1.5px solid var(--ink);padding:10px 14px;background:transparent;transition:background .2s,color .2s}
+.foot-nav button:active{background:var(--ink);color:var(--bone)}
+.share-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.18em;text-transform:uppercase;background:var(--red);color:var(--bone);padding:15px 22px;width:100%;
+  max-width:320px;margin:0 auto 26px;transition:transform .15s}
+.share-btn:active{transform:scale(.98)}
+.share-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 /* ============ TOASTS / CONFETTI ============ */
 #toast{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + 16px);transform:translate(-50%,140%);z-index:9300;
@@ -701,6 +730,13 @@ input,textarea{font-family:inherit}
 
         <div class="appfoot">
           <div class="f-logo">CHONG<span class="cjkstack"><span>冲</span><span>击</span></span>JI</div>
+          <button class="share-btn" id="share-app"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Partager l'appli</button>
+          <div class="foot-nav">
+            <button data-goto="home">Accueil</button>
+            <button data-goto="programme">Programme</button>
+            <button data-goto="billets">Billets</button>
+            <button data-goto="wallet">Mes billets</button>
+          </div>
           <p>© 2026 Festival Chong Ji 冲击<br>Projet de diplôme — Viktor Guignard<br>M2 DA Graphique · ESDAC Paris<br>événement fictif</p>
         </div>
       </div>
@@ -732,6 +768,11 @@ input,textarea{font-family:inherit}
       <span>Infos</span>
     </button>
   </nav>
+
+  <div id="cartbar" aria-hidden="true">
+    <span class="sum" id="cartbar-sum"></span>
+    <button type="button" id="cartbar-go">Finaliser →</button>
+  </div>
 
   <div id="toast" role="status"></div>
 </div>
@@ -766,6 +807,7 @@ function go(name){
   topbar.classList.toggle('titled',name!=='home');
   $('#tb-title').textContent=views[name].dataset.title;
   if(name==='wallet')renderWallet();
+  if(typeof updateCartbar==='function')updateCartbar();
   revealIn(views[name]);
 }
 tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.view)));
@@ -872,14 +914,29 @@ const CATALOG={
 const cart={reduit:0,plein:0,tribu:0};
 const linesEl=$('#lines'),totalEl=$('#total'),payBtn=$('#paybtn');
 
+function changeQty(id,delta){
+  cart[id]=Math.min(8,Math.max(0,cart[id]+delta));
+  syncCard(id);
+  renderCart();
+}
+function syncCard(id){
+  const card=document.querySelector('.tkt[data-id="'+id+'"]');
+  if(!card)return;
+  card.querySelector('.qty b').textContent=cart[id];
+  card.classList.toggle('sel',cart[id]>0);
+  const hint=card.querySelector('.addhint');
+  if(hint)hint.textContent=cart[id]>0?('Au panier × '+cart[id]):'Toucher pour ajouter';
+}
 $$('.tkt').forEach(card=>{
-  const id=card.dataset.id,out=card.querySelector('.qty b');
+  const id=card.dataset.id;
+  const hint=document.createElement('span');
+  hint.className='addhint';hint.textContent='Toucher pour ajouter';
+  card.querySelector('.price').after(hint);
+  // tap sur la carte = +1
+  card.addEventListener('click',()=>changeQty(id,1));
+  // les boutons +/- ne doivent pas redéclencher le tap de la carte
   card.querySelectorAll('.qty button').forEach(b=>{
-    b.addEventListener('click',()=>{
-      cart[id]=Math.min(8,Math.max(0,cart[id]+ +b.dataset.q));
-      out.textContent=cart[id];
-      renderCart();
-    });
+    b.addEventListener('click',e=>{e.stopPropagation();changeQty(id,+b.dataset.q);});
   });
 });
 function total(){return Object.keys(cart).reduce((t,k)=>t+cart[k]*CATALOG[k].price,0);}
@@ -887,12 +944,23 @@ function seats(){return Object.keys(cart).reduce((t,k)=>t+cart[k]*CATALOG[k].per
 function renderCart(){
   const rows=Object.keys(cart).filter(k=>cart[k]>0)
     .map(k=>`<div class="row"><span>${cart[k]} × ${CATALOG[k].name}</span><span>${cart[k]*CATALOG[k].price} €</span></div>`);
-  linesEl.innerHTML=rows.length?rows.join(''):'<div class="empty">Aucun billet sélectionné — choisissez ci-dessus.</div>';
+  linesEl.innerHTML=rows.length?rows.join(''):'<div class="empty">Aucun billet sélectionné — touchez une formule ci-dessus.</div>';
   totalEl.textContent=total()+' €';
   const n=seats();
   $('#cart-badge').textContent=n;$('#cart-badge').classList.toggle('show',n>0);
+  updateCartbar();
   validate();
 }
+const cartbar=$('#cartbar'),cbSum=$('#cartbar-sum');
+function updateCartbar(){
+  const show=total()>0 && current==='billets';
+  cartbar.classList.toggle('show',show);
+  cartbar.setAttribute('aria-hidden',String(!show));
+  if(show)cbSum.innerHTML=`${seats()} billet${seats()>1?'s':''} — <b>${total()} €</b>`;
+}
+$('#cartbar-go').addEventListener('click',()=>{
+  $('#checkout').scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});
+});
 function validate(){
   const ok=total()>0 && $('#f-name').value.trim().length>1 && /.+@.+\..+/.test($('#f-mail').value);
   payBtn.disabled=!ok;
@@ -925,8 +993,7 @@ $('#payform').addEventListener('submit',e=>{
       newTickets.push({holder,mail,label:lbls[i]||'Billet 1 entrée',porte,rang,place:base+i,code:barcodeNum(),ts:Date.now()});
     saveTickets(newTickets);
     // reset panier
-    Object.keys(cart).forEach(k=>cart[k]=0);
-    $$('.tkt .qty b').forEach(b=>b.textContent='0');
+    Object.keys(cart).forEach(k=>{cart[k]=0;syncCard(k);});
     renderCart();
     toast(`<b>${newTickets.length} billet${newTickets.length>1?'s':''}</b> ajouté${newTickets.length>1?'s':''} — confirmation envoyée à ${mail}`);
     if(!reduced)flash();
@@ -1073,6 +1140,18 @@ function flash(){
   const fl=document.createElement('div');fl.id='flash';fl.innerHTML='<b>冲击</b>';
   $('#app').appendChild(fl);setTimeout(()=>fl.remove(),1100);
 }
+
+/* ---- Partage de l'appli ---- */
+const SHARE_URL='https://viktor-guignard.github.io/chongji-festival/';
+const shareBtn=$('#share-app');
+if(shareBtn)shareBtn.addEventListener('click',async()=>{
+  const data={title:'CHONG JI 冲击 — Festival',text:'Des arts martiaux au 7e art · 7 août 2026 · Zénith Paris',url:SHARE_URL};
+  try{
+    if(navigator.share){await navigator.share(data);}
+    else if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(SHARE_URL);toast('Lien copié — partagez-le !');}
+    else{toast(SHARE_URL);}
+  }catch(e){/* partage annulé */}
+});
 
 /* ---- init ---- */
 renderCart();updateBadges();
