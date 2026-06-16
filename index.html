@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>CHONG JI 冲击 — L'appli du festival</title>
+<meta name="description" content="L'application du festival CHONG JI — programme, billets, accès. 7 août 2026, Zénith Paris.">
+<meta name="theme-color" content="#0A0A0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CHONG JI">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0A0B'/%3E%3Ctext x='32' y='46' font-size='40' font-family='sans-serif' font-weight='900' fill='%23C8141A' text-anchor='middle'%3E冲%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0A0B'/%3E%3Ctext x='32' y='46' font-size='40' font-family='sans-serif' font-weight='900' fill='%23C8141A' text-anchor='middle'%3E冲%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@900&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS — charte CHONG JI v1.1 ============ */
+:root{
+  --bone:#F2EFE6;
+  --bone-2:#EAE6D8;
+  --ink:#0A0A0B;
+  --ink-2:#141413;
+  --red:#C8141A;
+  --red-deep:#9E0F14;
+  --grey:#8A857B;
+  --display:'Archivo Black','Arial Black','Helvetica Neue',sans-serif;
+  --body:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --mono:'IBM Plex Mono','Courier New',monospace;
+  --cjk:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  --ease-hit:cubic-bezier(.83,0,.17,1);
+  --ease-snap:cubic-bezier(.16,1,.3,1);
+  --topbar-h:60px;
+  --tabbar-h:calc(64px + env(safe-area-inset-bottom));
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2.5px solid var(--red);outline-offset:2px}
+html{height:100%}
+body{
+  background:var(--ink);
+  color:var(--ink);
+  font-family:var(--body);
+  overflow:hidden;
+  height:100%;
+  overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--red);color:var(--bone)}
+img{max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea{font-family:inherit}
+
+/* grain global */
+#app::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:.045;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============ APP SHELL ============ */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bone);max-width:520px;margin:0 auto;
+  box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+
+/* ---- logo bilingue ---- */
+.cjkstack{display:inline-flex;flex-direction:column;align-items:center;
+  font-family:var(--cjk);font-weight:900;color:var(--red);
+  font-size:var(--cjk-size,.375em);line-height:1.02;transform:translateY(var(--cjk-lift,-1.05em));
+  letter-spacing:0}
+.cjkstack span{display:block}
+
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;font-weight:500}
+.tag.red{color:var(--red)}
+.tag.grey{color:var(--grey)}
+
+/* ============ SPLASH ============ */
+#splash{position:fixed;inset:0;background:var(--ink);z-index:9500;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:20px;transition:opacity .5s var(--ease-hit),transform .6s var(--ease-hit)}
+#splash.gone{opacity:0;transform:translateY(-30px);pointer-events:none}
+#splash .strike{position:absolute;left:-10%;top:50%;width:120%;height:80px;transform:translateY(-50%) scaleX(0);transform-origin:left;
+  animation:strike .55s var(--ease-hit) .2s forwards}
+@keyframes strike{to{transform:translateY(-50%) scaleX(1)}}
+#splash .word{position:relative;font-family:var(--display);color:var(--bone);font-size:clamp(40px,15vw,72px);letter-spacing:.02em;display:flex;gap:.16em;align-items:baseline}
+#splash .word span{opacity:0;transform:translateY(.5em);animation:pop .45s var(--ease-snap) forwards}
+@keyframes pop{to{opacity:1;transform:none}}
+#splash .sub{position:absolute;bottom:max(40px,env(safe-area-inset-bottom));left:0;right:0;text-align:center;
+  font-family:var(--mono);color:var(--grey);font-size:10.5px;letter-spacing:.34em;opacity:0;animation:fadein .5s 1s forwards}
+@keyframes fadein{to{opacity:1}}
+
+/* ============ TOP BAR ============ */
+.topbar{height:calc(var(--topbar-h) + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);
+  display:flex;align-items:center;justify-content:space-between;padding-left:18px;padding-right:14px;
+  background:var(--bone);position:relative;z-index:50;flex:none;
+  border-bottom:1px solid rgba(10,10,11,.08);transition:background .3s,color .3s,border-color .3s}
+.topbar.dark{background:var(--ink);color:var(--bone);border-color:rgba(242,239,230,.12)}
+.topbar .tb-logo{display:flex;align-items:baseline;gap:.28em;font-family:var(--display);font-size:18px;letter-spacing:.01em}
+.topbar .tb-title{font-family:var(--display);font-size:18px;letter-spacing:.01em;opacity:0;transform:translateY(8px);
+  position:absolute;left:18px;transition:opacity .35s var(--ease-snap),transform .35s var(--ease-snap);pointer-events:none}
+.topbar.titled .tb-logo{opacity:0}
+.topbar.titled .tb-title{opacity:1;transform:none}
+.topbar .tb-right{display:flex;align-items:center;gap:6px}
+.tb-icon{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:50%;position:relative;transition:background .2s}
+.tb-icon:active{background:rgba(10,10,11,.07)}
+.topbar.dark .tb-icon:active{background:rgba(242,239,230,.1)}
+.tb-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tb-badge{position:absolute;top:6px;right:6px;min-width:17px;height:17px;padding:0 4px;background:var(--red);color:var(--bone);
+  border-radius:9px;font-family:var(--mono);font-size:10px;font-weight:600;display:none;align-items:center;justify-content:center;line-height:1}
+.tb-badge.show{display:flex}
+
+/* ============ VIEWS ============ */
+.views{flex:1;position:relative;overflow:hidden}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--tabbar-h) + 20px);
+  opacity:0;visibility:hidden;transform:translateX(14px);
+  transition:opacity .32s var(--ease-snap),transform .32s var(--ease-snap),visibility .32s}
+.view.active{opacity:1;visibility:visible;transform:none}
+.view::-webkit-scrollbar{width:0}
+
+/* fond sombre pour certaines vues */
+.view.dark{background:var(--ink-2);color:var(--bone)}
+
+/* ============ TAB BAR ============ */
+.tabbar{height:var(--tabbar-h);padding-bottom:env(safe-area-inset-bottom);flex:none;
+  background:rgba(10,10,11,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  display:flex;align-items:stretch;justify-content:space-around;position:relative;z-index:60;
+  box-shadow:0 -1px 0 rgba(242,239,230,.1)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  color:var(--grey);position:relative;transition:color .25s;padding-top:6px}
+.tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--ease-snap)}
+.tab span{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase}
+.tab.active{color:var(--bone)}
+.tab.active svg{stroke:var(--red);transform:translateY(-1px) scale(1.06)}
+.tab:active svg{transform:scale(.88)}
+.tab .tb-badge{top:2px;right:calc(50% - 20px)}
+
+/* ============ COMPOSANTS COMMUNS ============ */
+.pad{padding:24px 20px}
+.sec-head{display:flex;flex-direction:column;gap:8px;margin-bottom:26px}
+.sec-head .num{font-family:var(--mono);color:var(--red);font-size:11px;letter-spacing:.3em}
+.sec-head h2{font-family:var(--display);font-size:clamp(30px,9vw,42px);line-height:.94;letter-spacing:-.01em}
+.sec-head .sub{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--grey);text-transform:uppercase;line-height:1.7;margin-top:4px}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease-snap),transform .6s var(--ease-snap)}
+.reveal.in{opacity:1;transform:none}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;
+  background:var(--red);color:var(--bone);padding:16px 22px;position:relative;overflow:hidden;width:100%;transition:transform .15s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--ink);outline:1.5px solid var(--ink);outline-offset:-1.5px}
+.view.dark .btn.ghost{color:var(--bone);outline-color:var(--bone)}
+
+/* ============ HOME / ACCUEIL ============ */
+#v-home{background:var(--ink);color:var(--bone)}
+.hero{position:relative;padding:30px 20px 34px;overflow:hidden;min-height:62vh;display:flex;flex-direction:column;justify-content:flex-end}
+.hero-meta{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2}
+.hero-meta .col{display:flex;flex-direction:column;gap:5px}
+.hero-meta .col.r{text-align:right}
+.hero-brush{position:absolute;left:-10%;right:-10%;top:42%;height:200px;z-index:0;pointer-events:none;transform:translateY(-50%)}
+.hero-brush svg{width:100%;height:100%}
+.hero-brush .b{stroke:var(--red);fill:none;stroke-linecap:round;stroke-dasharray:2400;stroke-dashoffset:2400}
+.booted .hero-brush .b{animation:draw 1.1s var(--ease-hit) .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.hero-title{position:relative;z-index:2;line-height:.86;font-family:var(--display);
+  font-size:84px;letter-spacing:-.01em;display:flex;flex-wrap:nowrap;white-space:nowrap;align-items:baseline;
+  column-gap:.1em;margin:auto 0;user-select:none;justify-content:center}
+.hero-title .ch{display:inline-block;opacity:0;transform:translateY(.6em)}
+.booted .hero-title .ch{animation:hit .5s var(--ease-snap) forwards;animation-delay:calc(.35s + var(--i)*.05s)}
+@keyframes hit{60%{transform:translateY(-.04em)}100%{opacity:1;transform:none}}
+.hero-title .cjkstack{opacity:0}
+.booted .hero-title .cjkstack{animation:hit .5s var(--ease-snap) .85s forwards}
+.hero-tagline{font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.34em;text-transform:uppercase;
+  text-align:center;color:var(--bone);position:relative;z-index:2;margin-top:18px}
+
+/* countdown */
+.countdown{display:flex;justify-content:space-between;gap:6px;background:var(--ink-2);padding:20px 16px;
+  border-top:1px solid rgba(242,239,230,.12);border-bottom:1px solid rgba(242,239,230,.12)}
+.countdown div{text-align:center;flex:1}
+.countdown b{display:block;font-family:var(--display);font-size:clamp(26px,8vw,38px);font-weight:400;line-height:1;color:var(--bone)}
+.countdown i{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--grey);text-transform:uppercase}
+
+/* marquee */
+.marquee{background:var(--red);color:var(--bone);overflow:hidden;padding:11px 0;position:relative}
+.mq-track{display:flex;width:max-content;animation:mq 20s linear infinite;will-change:transform}
+.mq-track span{font-family:var(--display);font-size:18px;letter-spacing:.04em;padding:0 .6em;white-space:nowrap}
+.mq-track .dot{color:var(--ink)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* manifeste */
+.manifesto{font-family:var(--display);font-size:clamp(22px,6.6vw,30px);line-height:1.12;letter-spacing:-.01em;color:var(--bone)}
+.manifesto em{font-style:normal;color:var(--red)}
+
+/* piliers en cartes scroll horizontal */
+.hscroll{display:flex;gap:14px;overflow-x:auto;padding:4px 20px 8px;margin:0 -20px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.hscroll::-webkit-scrollbar{height:0}
+.pillar{flex:0 0 78%;scroll-snap-align:center;background:var(--ink-2);border:1px solid rgba(242,239,230,.14);
+  padding:24px 22px 26px;display:flex;flex-direction:column}
+.pillar .cjkbig{font-family:var(--cjk);font-weight:900;font-size:46px;color:var(--red);line-height:1;margin-bottom:16px}
+.pillar h3{font-family:var(--display);font-size:22px;margin-bottom:12px;letter-spacing:.02em;color:var(--bone)}
+.pillar p{font-size:14px;line-height:1.7;color:var(--grey)}
+.pillar .tag{margin-bottom:18px}
+
+/* key facts */
+.keyfacts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(242,239,230,.14);border:1px solid rgba(242,239,230,.14)}
+.kf{padding:22px 18px;display:flex;flex-direction:column;gap:7px;background:var(--ink)}
+.kf b{font-family:var(--display);font-size:30px;font-weight:400;line-height:1;color:var(--bone)}
+.kf b .u{color:var(--red);font-size:.5em}
+.kf span{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--grey);text-transform:uppercase;line-height:1.5}
+
+/* ============ PROGRAMME ============ */
+.timeline{border-top:1px solid rgba(242,239,230,.16)}
+.slot{display:flex;gap:16px;padding:22px 4px;border-bottom:1px solid rgba(242,239,230,.16);position:relative}
+.slot .left{flex:none;display:flex;flex-direction:column;align-items:center;gap:10px;width:60px}
+.slot .h{font-family:var(--display);font-size:18px;color:var(--red);line-height:1}
+.slot .ic{width:44px;height:44px;border:1.5px solid rgba(242,239,230,.35);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.slot .ic svg{width:21px;height:21px;stroke:var(--bone);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.slot .body{flex:1;min-width:0}
+.slot h3{font-family:var(--display);font-size:16px;letter-spacing:.02em;margin-bottom:6px;color:var(--bone)}
+.slot p{font-size:13px;line-height:1.65;color:var(--grey)}
+.slot .meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--grey);text-transform:uppercase;margin-top:9px}
+.slot.spotlight{background:linear-gradient(90deg,rgba(200,20,26,.16),transparent 70%);margin:0 -8px;padding:22px 12px;border-radius:4px}
+.slot.spotlight .ic{border-color:var(--red)}
+.slot .live{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--red);margin-bottom:7px}
+.slot .live i{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;animation:blink 1.2s steps(1) infinite}
+@keyframes blink{50%{opacity:.2}}
+
+/* cinema card */
+.cine-card{background:var(--ink);border:1px solid rgba(242,239,230,.16);margin-top:30px}
+.screen{position:relative;aspect-ratio:16/10;background:var(--ink-2);overflow:hidden}
+.screen .frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:16px;text-align:center;
+  opacity:0;transform:scale(1.04);transition:opacity .6s var(--ease-snap),transform .6s var(--ease-snap)}
+.screen .frame.on{opacity:1;transform:none}
+.screen .frame .big{font-family:var(--display);font-size:clamp(20px,6vw,26px);letter-spacing:.02em;line-height:1.05;color:var(--bone)}
+.screen .frame .big.red{color:var(--red);font-size:clamp(40px,13vw,60px)}
+.screen .frame .small{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--grey);text-transform:uppercase}
+.screen .traj{position:absolute;inset:0;pointer-events:none}
+.screen .traj path{stroke:var(--red);stroke-width:2;fill:none;stroke-dasharray:600;stroke-dashoffset:600}
+.screen .frame.on .traj path{animation:draw .9s var(--ease-hit) .25s forwards}
+.screen .counter{position:absolute;top:12px;left:14px;font-family:var(--mono);font-size:9px;letter-spacing:.28em;color:var(--red);z-index:2}
+.screen .rec{position:absolute;top:11px;right:14px;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;letter-spacing:.22em;color:var(--grey);z-index:2}
+.screen .rec::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--red);animation:blink 1.2s steps(1) infinite}
+.fdots{display:flex;justify-content:center;gap:9px;padding:14px 0 4px}
+.fdots button{width:24px;height:3px;background:rgba(242,239,230,.28);transition:background .3s}
+.fdots button.on{background:var(--red)}
+.cine-copy{padding:20px;border-top:1px solid rgba(242,239,230,.16)}
+.cine-copy h3{font-family:var(--display);font-size:21px;line-height:1.1;margin-bottom:14px;color:var(--bone)}
+.cine-copy h3 em{font-style:normal;color:var(--red)}
+.cine-copy p{color:var(--grey);line-height:1.75;font-size:14px}
+
+/* maitres */
+.masters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.master{border:1.5px solid rgba(242,239,230,.18);position:relative;overflow:hidden;aspect-ratio:3/3.6;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:16px;background:var(--ink)}
+.master .glyph{position:absolute;top:-10px;right:2px;font-family:var(--cjk);font-weight:900;font-size:92px;line-height:1;color:var(--red);opacity:.12}
+.master .disc{position:absolute;top:14px;left:14px;font-size:8.5px}
+.master h3{font-family:var(--display);font-size:16px;line-height:1.1;margin-bottom:6px;position:relative;color:var(--bone)}
+.master p{font-size:11.5px;line-height:1.55;color:var(--grey);position:relative}
+.master .strikeline{position:absolute;left:0;bottom:0;height:4px;width:100%;background:var(--red)}
+
+/* ============ BILLETS ============ */
+#v-billets{background:var(--red);color:var(--bone)}
+#v-billets .sec-head h2{color:var(--bone)}
+#v-billets .sec-head .num{color:var(--ink)}
+#v-billets .sec-head .sub{color:rgba(242,239,230,.8)}
+
+/* jauge */
+.gauge{display:flex;flex-direction:column;gap:9px;margin-bottom:26px}
+.gauge .bar{height:8px;background:rgba(10,10,11,.28);position:relative;overflow:hidden}
+.gauge .bar i{position:absolute;inset:0;width:0;background:var(--ink);transition:width 1.4s var(--ease-hit) .3s}
+.gauge.in .bar i{width:var(--sold,73%)}
+.gauge .lbl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase}
+.gauge .lbl b{color:var(--ink);font-weight:600}
+.gauge .lbl span{color:rgba(242,239,230,.85)}
+
+.tickets{display:flex;flex-direction:column;gap:18px;margin-bottom:8px}
+.tkt{background:var(--bone);color:var(--ink);position:relative;padding:24px 22px 22px;display:flex;flex-direction:column;gap:12px}
+.tkt::before,.tkt::after{content:'';position:absolute;width:24px;height:24px;border-radius:50%;background:var(--red);top:50%;transform:translateY(-50%)}
+.tkt::before{left:-12px}.tkt::after{right:-12px}
+.tkt.featured{outline:3px solid var(--ink);outline-offset:-3px}
+.tkt .ribbon{position:absolute;top:-12px;right:16px;background:var(--ink);color:var(--bone);font-family:var(--mono);font-size:9px;letter-spacing:.22em;padding:6px 11px;text-transform:uppercase}
+.tkt .name{font-family:var(--display);font-size:21px;letter-spacing:.02em}
+.tkt .price{font-family:var(--display);font-size:42px;line-height:1}
+.tkt .price small{font-size:.42em;vertical-align:super}
+.tkt ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.tkt ul li{font-size:13px;color:var(--grey);display:flex;gap:9px;align-items:baseline;line-height:1.4}
+.tkt ul li::before{content:'冲';font-family:var(--cjk);font-weight:900;color:var(--red);font-size:10px;flex:none}
+.tkt .perfo{border-top:2px dashed rgba(10,10,11,.28);margin:4px 0}
+.tkt .qty{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--ink);padding:8px 10px}
+.tkt .qty span{font-family:var(--mono);font-size:11px;letter-spacing:.16em}
+.tkt .qty .ops{display:flex;gap:6px;align-items:center}
+.tkt .qty button{width:38px;height:38px;border:1.5px solid var(--ink);font-family:var(--mono);font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;color:var(--ink)}
+.tkt .qty button:active{background:var(--ink);color:var(--bone)}
+.tkt .qty b{font-family:var(--display);width:34px;text-align:center;font-size:19px;font-weight:400}
+
+/* checkout */
+.checkout{background:var(--ink);color:var(--bone);padding:24px 20px;margin-top:8px}
+.co-summary .row{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid rgba(242,239,230,.15);font-family:var(--mono);font-size:12px;letter-spacing:.08em}
+.co-summary .row.total{border-bottom:none;padding-top:16px;align-items:baseline}
+.co-summary .row.total b{font-family:var(--display);font-size:34px;font-weight:400}
+.co-summary .empty{color:var(--grey);font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;padding:12px 0}
+.co-form{display:flex;flex-direction:column;gap:16px;margin-top:22px}
+.co-form label{display:flex;flex-direction:column;gap:7px;font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--grey)}
+.co-form input{background:transparent;border:none;border-bottom:1.5px solid rgba(242,239,230,.4);color:var(--bone);
+  font-family:var(--body);font-size:17px;padding:10px 2px;outline:none;transition:border-color .25s}
+.co-form input:focus{border-color:var(--red)}
+.paybtn{margin-top:6px;background:var(--red);color:var(--bone);font-family:var(--mono);letter-spacing:.2em;text-transform:uppercase;font-size:12px;padding:18px;transition:opacity .25s,transform .15s;width:100%}
+.paybtn:active{transform:scale(.98)}
+.paybtn[disabled]{opacity:.35;pointer-events:none}
+.secure{font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--grey);text-transform:uppercase;text-align:center;margin-top:4px;line-height:1.6}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+.co-form.err{animation:shake .45s}
+
+/* ============ BILLET (wallet) ============ */
+.bticket{background:var(--bone);color:var(--ink);position:relative;display:flex;flex-direction:column;
+  box-shadow:0 18px 44px rgba(10,10,11,.4);animation:tin .6s var(--ease-snap)}
+@keyframes tin{from{opacity:0;transform:translateY(28px)}}
+.bticket .main{padding:22px 22px 18px;position:relative;overflow:hidden}
+.bticket .main>*:not(.bbrush){position:relative;z-index:1}
+.bticket .bbrush{position:absolute;right:-30px;top:-30px;width:240px;height:90px;opacity:.9;pointer-events:none;z-index:0}
+.bticket .blogo{display:flex;align-items:baseline;gap:.3em;font-family:var(--display);font-size:24px}
+.bticket .bbase{font-family:var(--mono);font-size:8.5px;letter-spacing:.26em;color:var(--red);text-transform:uppercase;margin:5px 0 18px;line-height:1.5}
+.bticket .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
+.bticket .cell.full{grid-column:1 / -1}
+.bticket .cell span{display:block;font-family:var(--mono);font-size:8px;letter-spacing:.24em;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.bticket .cell b{font-family:var(--display);font-weight:400;font-size:15px;letter-spacing:.02em}
+.bticket .footer{margin-top:18px;background:var(--ink);color:var(--bone);font-family:var(--mono);font-size:8px;letter-spacing:.16em;
+  padding:9px 12px;display:flex;flex-direction:column;gap:4px;text-transform:uppercase}
+.bticket .stub{border-top:2px dashed rgba(10,10,11,.35);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative}
+.bticket .stub::before,.bticket .stub::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:inherit;top:-11px;z-index:2}
+.bticket .stub .holder{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--red)}
+.bticket .stub .num{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--grey);margin-top:3px}
+.barcode{height:54px;flex:none;width:46%}
+
+/* wallet view */
+#v-wallet{background:var(--ink-2);color:var(--bone)}
+.wallet-empty{text-align:center;padding:60px 24px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.wallet-empty .glyph{font-family:var(--cjk);font-weight:900;font-size:80px;color:var(--red);opacity:.5;line-height:1}
+.wallet-empty h3{font-family:var(--display);font-size:24px;color:var(--bone)}
+.wallet-empty p{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--grey);text-transform:uppercase;line-height:1.7;max-width:30ch}
+.wallet-list{display:flex;flex-direction:column;gap:20px}
+.tkt-actions{display:flex;gap:9px;margin-top:12px}
+.tkt-actions button{flex:1;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--bone);
+  border:1px solid rgba(242,239,230,.4);padding:11px 8px;background:transparent;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .2s,color .2s}
+.tkt-actions button:active{background:var(--bone);color:var(--ink)}
+.tkt-actions button.danger{border-color:rgba(200,20,26,.6);color:#ff7a7e}
+.tkt-actions button.danger:active{background:var(--red);color:var(--bone)}
+
+/* ============ INFOS / FAQ ============ */
+#v-infos{background:var(--bone)}
+.access{border:1.5px solid var(--ink);margin-bottom:30px}
+.access .row{display:grid;grid-template-columns:96px 1fr;border-bottom:1.5px solid var(--ink)}
+.access .row:last-child{border-bottom:none}
+.access .row .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);
+  padding:16px 12px;border-right:1.5px solid var(--ink);display:flex;align-items:center}
+.access .row .v{padding:16px 14px;font-size:13.5px;line-height:1.6}
+.access .row .v b{font-family:var(--display);font-weight:400;font-size:15px;display:block;margin-bottom:4px}
+.faq details{border-bottom:1.5px solid var(--ink)}
+.faq details:first-of-type{border-top:1.5px solid var(--ink)}
+.faq summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:18px 4px;font-family:var(--display);font-size:15px;letter-spacing:.01em;cursor:pointer}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .x{font-family:var(--mono);color:var(--red);font-size:20px;transition:transform .35s var(--ease-snap);flex:none}
+.faq details[open] .x{transform:rotate(45deg)}
+.faq .a{padding:0 4px 20px;color:var(--grey);line-height:1.8;font-size:13.5px}
+
+/* footer mini */
+.appfoot{padding:30px 20px calc(var(--tabbar-h));text-align:center;border-top:1px solid rgba(10,10,11,.1);margin-top:10px}
+.appfoot .f-logo{font-family:var(--display);font-size:26px;display:inline-flex;align-items:baseline;gap:.3em;margin-bottom:12px}
+.appfoot p{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--grey);text-transform:uppercase;line-height:1.8}
+
+/* ============ TOASTS / CONFETTI ============ */
+#toast{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + 16px);transform:translate(-50%,140%);z-index:9300;
+  background:var(--ink);color:var(--bone);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  padding:14px 20px;max-width:90%;text-align:center;transition:transform .4s var(--ease-hit);box-shadow:0 12px 34px rgba(0,0,0,.4)}
+#toast.show{transform:translate(-50%,0)}
+#toast b{color:var(--red)}
+#flash{position:fixed;inset:0;z-index:9400;background:var(--red);display:flex;align-items:center;justify-content:center;
+  animation:flashout 1.1s var(--ease-hit) forwards;pointer-events:none;max-width:520px;margin:0 auto}
+#flash b{font-family:var(--cjk);font-weight:900;font-size:40vw;color:var(--bone);animation:flashzoom 1.1s var(--ease-snap)}
+@keyframes flashout{0%,70%{clip-path:inset(0)}100%{clip-path:inset(0 0 100% 0)}}
+@keyframes flashzoom{from{transform:scale(.6) rotate(-6deg)}30%{transform:scale(1.04)}to{transform:scale(1)}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+@media (min-width:520px){
+  #app{border-radius:0}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SPLASH -->
+  <div id="splash">
+    <svg class="strike" viewBox="0 0 1200 90" preserveAspectRatio="none"><path d="M0,50 C200,38 420,62 640,46 C860,30 1040,58 1200,42 L1200,64 C1000,76 760,50 540,64 C320,78 140,56 0,68 Z" fill="#C8141A"/></svg>
+    <div class="word">
+      <span style="animation-delay:.25s">CHONG</span>
+      <span class="cjkstack" style="animation:none;opacity:1"><span>冲</span><span>击</span></span>
+      <span style="animation-delay:.55s">JI</span>
+    </div>
+    <div class="sub">DES ARTS MARTIAUX AU 7<sup>E</sup> ART · 07.08.2026</div>
+  </div>
+
+  <!-- TOP BAR -->
+  <header class="topbar dark" id="topbar">
+    <a class="tb-logo" id="tb-logo">CHONG<span class="cjkstack"><span>冲</span><span>击</span></span>JI</a>
+    <span class="tb-title" id="tb-title">Accueil</span>
+    <div class="tb-right">
+      <button class="tb-icon" id="goWallet" aria-label="Mes billets">
+        <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10h18M16 14h2"/></svg>
+        <span class="tb-badge" id="wallet-badge">0</span>
+      </button>
+      <button class="tb-icon" id="goBillets" aria-label="Billetterie">
+        <svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12"/></svg>
+        <span class="tb-badge" id="cart-badge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- VIEWS -->
+  <main class="views" id="views">
+
+    <!-- ===== ACCUEIL ===== -->
+    <section class="view active" id="v-home" data-title="Accueil">
+      <div class="hero">
+        <div class="hero-meta">
+          <div class="col">
+            <span class="tag red">Festival · 1<sup>re</sup> édition</span>
+            <span class="tag grey">Zénith Paris</span>
+          </div>
+          <div class="col r">
+            <span class="tag">07.08.2026</span>
+            <span class="tag grey">10h — 20h</span>
+          </div>
+        </div>
+        <div class="hero-brush" aria-hidden="true">
+          <svg viewBox="0 0 1400 220" preserveAspectRatio="none">
+            <defs><filter id="dry" x="-5%" y="-50%" width="110%" height="200%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.012 0.18" numOctaves="3" seed="7" result="t"/>
+              <feDisplacementMap in="SourceGraphic" in2="t" scale="40"/>
+            </filter></defs>
+            <g filter="url(#dry)">
+              <path class="b" d="M-20,150 C260,120 520,160 760,118 C980,80 1200,110 1430,72" stroke-width="56"/>
+              <path class="b" d="M-20,168 C300,150 560,180 820,142 C1040,110 1240,132 1430,98" stroke-width="14" style="animation-delay:.7s"/>
+            </g>
+          </svg>
+        </div>
+        <div class="hero-title" aria-label="CHONG JI">
+          <span class="ch" style="--i:0">C</span><span class="ch" style="--i:1">H</span><span class="ch" style="--i:2">O</span><span class="ch" style="--i:3">N</span><span class="ch" style="--i:4">G</span>
+          <span class="cjkstack" aria-hidden="true"><span>冲</span><span>击</span></span>
+          <span class="ch" style="--i:6">J</span><span class="ch" style="--i:7">I</span>
+        </div>
+        <p class="hero-tagline">Des arts martiaux au 7<sup>e</sup> art</p>
+      </div>
+
+      <div class="countdown" id="countdown" aria-label="Compte à rebours">
+        <div><b id="cd-d">000</b><i>jours</i></div>
+        <div><b id="cd-h">00</b><i>heures</i></div>
+        <div><b id="cd-m">00</b><i>min</i></div>
+        <div><b id="cd-s">00</b><i>sec</i></div>
+      </div>
+
+      <div class="marquee" aria-hidden="true"><div class="mq-track" id="mq1"></div></div>
+
+      <div class="pad">
+        <p class="manifesto reveal">Le festival CHONG JI relie la pratique martiale au cinéma qui a construit son imaginaire — de la <em>précision de Bruce Lee</em> à la <em>chorégraphie de Jackie Chan</em>.</p>
+      </div>
+
+      <div class="hscroll reveal">
+        <article class="pillar">
+          <span class="tag red">Pilier 01</span>
+          <span class="cjkbig">力</span>
+          <h3>ÉNERGIE</h3>
+          <p>Des performances spectaculaires mêlant précision, puissance et maîtrise. Chaque temps fort communique une force.</p>
+        </article>
+        <article class="pillar">
+          <span class="tag red">Pilier 02</span>
+          <span class="cjkbig">张</span>
+          <h3>TENSION</h3>
+          <p>Le silence avant le choc. Des ateliers ouverts à tous pour ressentir la posture, la respiration, le seuil du geste.</p>
+        </article>
+        <article class="pillar">
+          <span class="tag red">Pilier 03</span>
+          <span class="cjkbig">击</span>
+          <h3>IMPACT</h3>
+          <p>Une immersion dans le lien entre arts martiaux, mise en scène et cinéma d'action — le geste et son image.</p>
+        </article>
+      </div>
+
+      <div class="pad" style="padding-top:8px">
+        <div class="keyfacts reveal">
+          <div class="kf"><b>1<span class="u"> jour</span></b><span>10h — 20h non-stop</span></div>
+          <div class="kf"><b>7<span class="u"> temps forts</span></b><span>ouverture à clôture</span></div>
+          <div class="kf"><b>4<span class="u"> formats</span></b><span>démos · initiations · ciné · rencontres</span></div>
+          <div class="kf"><b>6 000<span class="u"> places</span></b><span>Zénith Paris</span></div>
+        </div>
+      </div>
+
+      <div class="pad" style="padding-top:6px">
+        <button class="btn" data-goto="billets"><span>Prendre mes billets — 7 août</span></button>
+      </div>
+    </section>
+
+    <!-- ===== PROGRAMME ===== -->
+    <section class="view dark" id="v-programme" data-title="Programme">
+      <div class="pad">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2>Une journée,<br>sept frappes.</h2>
+          <p class="sub">Accès libre à tous les temps forts. Show final en placement numéroté.</p>
+        </div>
+
+        <div class="timeline" id="timeline">
+          <div class="slot" data-h="10">
+            <div class="left"><div class="h">10H</div><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 7h18M5 7l1-3h12l1 3M7 7v13M17 7v13M4 10h16"/></svg></div></div>
+            <div class="body"><h3>OUVERTURE DU FESTIVAL</h3><p>Accueil du public, présentation de la journée et introduction à l'univers Chong Ji.</p><div class="meta">Grande scène · 60 min</div></div>
+          </div>
+          <div class="slot" data-h="11">
+            <div class="left"><div class="h">11H</div><div class="ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="5" r="1.6"/><path d="M9 7.5l1 4-4 7M10 11.5l9-2M9 11l-4 2"/></svg></div></div>
+            <div class="body"><h3>GRANDES DÉMONSTRATIONS</h3><p>Kung-fu traditionnel, formes, armes, combats chorégraphiés et performances scéniques.</p><div class="meta">Grande scène · 90 min</div></div>
+          </div>
+          <div class="slot" data-h="12.5">
+            <div class="left"><div class="h">12H30</div><div class="ic"><svg viewBox="0 0 24 24"><circle cx="8" cy="6" r="1.7"/><circle cx="16" cy="6" r="1.7"/><path d="M8 9v6M16 9v6M8 12h8"/></svg></div></div>
+            <div class="body"><h3>RENCONTRE AVEC LES MAÎTRES</h3><p>Échanges autour de la transmission, de la discipline et de la philosophie martiale.</p><div class="meta">Forum · 60 min</div></div>
+          </div>
+          <div class="slot" data-h="14">
+            <div class="left"><div class="h">14H</div><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="4.6" r="1.7"/><path d="M12 7v5M4 10h16M12 12l-4 7M12 12l4 7"/></svg></div></div>
+            <div class="body"><h3>INITIATIONS OUVERTES</h3><p>Ateliers découverte pour débutants : posture, respiration, coordination, gestes fondamentaux. Badges à collectionner.</p><div class="meta">Espaces initiation · 120 min</div></div>
+          </div>
+          <div class="slot spotlight" data-h="16">
+            <div class="left"><div class="h">16H</div><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="1"/><path d="M3 8l18-3M7 7.4l2.4 3M12 6.5l2.4 3M17 5.7l2.4 3"/></svg></div></div>
+            <div class="body"><h3>ARTS MARTIAUX &amp; CINÉMA</h3><p>Projection d'extraits, analyse de scènes cultes et démonstration des techniques derrière l'image.</p><div class="meta">Le cœur du festival · 90 min</div></div>
+          </div>
+          <div class="slot" data-h="18">
+            <div class="left"><div class="h">18H</div><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20L18 6M18 6l1-3 -3 1M20 20L6 6M6 6L5 3l3 1M7 17l-2 2M17 17l2 2"/></svg></div></div>
+            <div class="body"><h3>SHOW FINAL CHONG JI</h3><p>Performance immersive mêlant combat, musique, lumière et chorégraphie. Placement numéroté.</p><div class="meta">Grande scène · assis · 90 min</div></div>
+          </div>
+          <div class="slot" data-h="20">
+            <div class="left"><div class="h">20H</div><div class="ic"><svg viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-4.2-6.4"/><circle cx="17.5" cy="6.5" r="0.8"/></svg></div></div>
+            <div class="body"><h3>CLÔTURE</h3><p>Temps d'échange, photos et rencontre avec les intervenants.</p><div class="meta">Parvis &amp; hall</div></div>
+          </div>
+        </div>
+
+        <!-- CINEMA -->
+        <div class="sec-head" style="margin-top:46px">
+          <span class="num">03</span>
+          <h2>Le geste<br>et son image.</h2>
+          <p class="sub">16h — la séance qui donne son nom au festival.</p>
+        </div>
+        <div class="cine-card">
+          <div class="screen" id="screen">
+            <span class="counter" id="frame-counter">SCÈNE 01 / 04</span>
+            <span class="rec">Analyse</span>
+            <div class="frame on">
+              <svg class="traj" viewBox="0 0 600 340" preserveAspectRatio="none"><path d="M60,260 C180,250 240,150 330,120 C420,90 500,110 560,70"/></svg>
+              <div class="big">LE COUP DE PIED LATÉRAL</div>
+              <div class="small">Bruce Lee · trajectoire décomposée</div>
+            </div>
+            <div class="frame">
+              <svg class="traj" viewBox="0 0 600 340" preserveAspectRatio="none"><path d="M70,90 C150,200 230,80 320,190 C400,280 470,160 550,240"/></svg>
+              <div class="big">LA CASCADE RACONTÉE</div>
+              <div class="small">Jackie Chan · le décor comme partenaire</div>
+            </div>
+            <div class="frame">
+              <div class="big red">冲击</div>
+              <div class="big" style="font-size:18px">LE SILENCE AVANT LE CHOC</div>
+              <div class="small">Cadrage · tension · impact</div>
+            </div>
+            <div class="frame">
+              <div class="big">PUIS LA SCÈNE REJOUE L'ÉCRAN</div>
+              <div class="small">Démonstration en direct des techniques</div>
+            </div>
+          </div>
+          <div class="fdots" id="fdots"><button class="on" aria-label="Scène 1"></button><button aria-label="Scène 2"></button><button aria-label="Scène 3"></button><button aria-label="Scène 4"></button></div>
+          <div class="cine-copy">
+            <h3>Une leçon de regard, <em>image par image.</em></h3>
+            <p>Projection d'extraits du cinéma de Hong Kong, analyse de scènes cultes plan par plan, puis démonstration sur scène des techniques derrière l'image. Vous ne regarderez plus jamais un combat de la même façon.</p>
+          </div>
+        </div>
+
+        <!-- MAITRES -->
+        <div class="sec-head" style="margin-top:46px">
+          <span class="num">04</span>
+          <h2>Ceux qui<br>transmettent.</h2>
+          <p class="sub">Maîtres, chorégraphes et passionnés.</p>
+        </div>
+        <div class="masters">
+          <article class="master"><span class="glyph">拳</span><span class="disc tag red">Hung Gar</span><h3>MAÎTRE LIANG WEI</h3><p>40 ans de pratique. Ouvre la journée et conduit la rencontre de 12h30.</p><span class="strikeline"></span></article>
+          <article class="master"><span class="glyph">影</span><span class="disc tag red">Chorégraphie</span><h3>NADIA REKIK</h3><p>Cascadeuse et régleuse de combats. Décompose la cascade à 16h.</p><span class="strikeline"></span></article>
+          <article class="master"><span class="glyph">武</span><span class="disc tag red">Wushu</span><h3>THÉO LAM</h3><p>Champion d'Europe de formes. Mène démos et initiations.</p><span class="strikeline"></span></article>
+          <article class="master"><span class="glyph">史</span><span class="disc tag red">Cinéma HK</span><h3>CLAIRE AUBERT</h3><p>Historienne du cinéma d'action. Commente les extraits de 16h.</p><span class="strikeline"></span></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BILLETS ===== -->
+    <section class="view" id="v-billets" data-title="Billetterie">
+      <div class="pad">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2>Prenez<br>votre place.</h2>
+          <p class="sub">Accès à tous les temps forts · 10h–20h · show final inclus.</p>
+        </div>
+
+        <div class="gauge" id="gauge" aria-label="Remplissage">
+          <div class="bar"><i style="--sold:73%"></i></div>
+          <div class="lbl"><b>73 % des places vendues</b><span>6 000 places</span></div>
+        </div>
+
+        <div class="tickets">
+          <article class="tkt" data-id="reduit">
+            <span class="tag red">Tarif réduit</span>
+            <div class="name">LA RELÈVE</div>
+            <div class="price">25<small>€</small></div>
+            <ul>
+              <li>Étudiants, –26 ans, demandeurs d'emploi</li>
+              <li>Tous les temps forts · 10h–20h</li>
+              <li>Show final · placement numéroté</li>
+            </ul>
+            <div class="perfo"></div>
+            <div class="qty"><span>Quantité</span><div class="ops"><button data-q="-1" aria-label="Retirer">−</button><b>0</b><button data-q="1" aria-label="Ajouter">+</button></div></div>
+          </article>
+          <article class="tkt featured" data-id="plein">
+            <span class="ribbon">Le plus choisi</span>
+            <span class="tag red">Plein tarif</span>
+            <div class="name">LA JOURNÉE</div>
+            <div class="price">35<small>€</small></div>
+            <ul>
+              <li>Tous les temps forts · 10h–20h</li>
+              <li>Show final · placement numéroté</li>
+              <li>Carton de séance « Arts martiaux &amp; cinéma »</li>
+              <li>Badges d'initiation à collectionner</li>
+            </ul>
+            <div class="perfo"></div>
+            <div class="qty"><span>Quantité</span><div class="ops"><button data-q="-1" aria-label="Retirer">−</button><b>0</b><button data-q="1" aria-label="Ajouter">+</button></div></div>
+          </article>
+          <article class="tkt" data-id="tribu">
+            <span class="tag red">Pack 4 places</span>
+            <div class="name">LA TRIBU</div>
+            <div class="price">120<small>€</small></div>
+            <ul>
+              <li>4 billets · places côte à côte</li>
+              <li>Soit 30 € la place</li>
+              <li>1 tote bag CHONG JI offert</li>
+            </ul>
+            <div class="perfo"></div>
+            <div class="qty"><span>Packs</span><div class="ops"><button data-q="-1" aria-label="Retirer">−</button><b>0</b><button data-q="1" aria-label="Ajouter">+</button></div></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="checkout" id="checkout">
+        <span class="tag red" style="display:block;margin-bottom:14px">Votre commande</span>
+        <div class="co-summary">
+          <div id="lines"><div class="empty">Aucun billet sélectionné — choisissez ci-dessus.</div></div>
+          <div class="row total"><span class="tag grey">Total</span><b id="total" aria-live="polite">0 €</b></div>
+        </div>
+        <form class="co-form" id="payform" novalidate>
+          <span class="tag red">Vos billets sont nominatifs</span>
+          <label>Nom du porteur
+            <input type="text" id="f-name" placeholder="VIKTOR GUIGNARD" autocomplete="name" maxlength="26" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase">
+          </label>
+          <label>E-mail de confirmation
+            <input type="email" id="f-mail" placeholder="vous@exemple.fr" autocomplete="email" inputmode="email">
+          </label>
+          <button class="paybtn" id="paybtn" disabled type="submit">Payer — recevoir mes billets</button>
+          <span class="secure">Paiement sécurisé · billets non échangeables · démo de conception</span>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== MES BILLETS (WALLET) ===== -->
+    <section class="view" id="v-wallet" data-title="Mes billets">
+      <div class="pad" id="wallet-content"></div>
+    </section>
+
+    <!-- ===== INFOS ===== -->
+    <section class="view" id="v-infos" data-title="Infos">
+      <div class="pad">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2>Préparez<br>votre venue.</h2>
+          <p class="sub">Tout public · débutants bienvenus · accessibilité PMR.</p>
+        </div>
+        <div class="access">
+          <div class="row"><div class="k">Date</div><div class="v"><b>Ven. 7 août 2026</b>Portes 9h15 — clôture 20h.</div></div>
+          <div class="row"><div class="k">Lieu</div><div class="v"><b>Zénith Paris</b>211 av. Jean-Jaurès, 75019 · <a href="https://maps.google.com/?q=Z%C3%A9nith+Paris+La+Villette" target="_blank" rel="noopener" style="color:var(--red);text-decoration:underline;text-underline-offset:3px">Itinéraire ↗</a></div></div>
+          <div class="row"><div class="k">Accès</div><div class="v"><b>M° Porte de Pantin (5)</b>Tram T3b · Bus 75, 151. La trace rouge au sol vous guide jusqu'aux portes.</div></div>
+          <div class="row"><div class="k">Public</div><div class="v"><b>Tout public</b>Initiations dès 8 ans, accompagné d'un adulte.</div></div>
+          <div class="row"><div class="k">Sur place</div><div class="v"><b>Resto · vestiaire · boutique</b>Zine, totes et badges en édition limitée.</div></div>
+        </div>
+        <div class="faq">
+          <details><summary>Faut-il pratiquer un art martial ? <span class="x">+</span></summary><div class="a">Non. CHONG JI s'adresse autant aux curieux qu'aux pratiquants. Les initiations de 14h sont conçues pour les grands débutants : posture, respiration, coordination — en tenue de ville confortable.</div></details>
+          <details><summary>Mon billet donne accès à quoi ? <span class="x">+</span></summary><div class="a">À tous les temps forts de 10h à 20h, en déambulation libre. Seul le show final de 18h est assis : votre porte, rang et place figurent sur votre billet nominatif.</div></details>
+          <details><summary>Billets échangeables ou remboursables ? <span class="x">+</span></summary><div class="a">Les billets sont nominatifs et non échangeables. En cas d'annulation de l'événement, ils sont intégralement remboursés. Conservez votre billet jusqu'à la fin.</div></details>
+          <details><summary>Peut-on venir avec des enfants ? <span class="x">+</span></summary><div class="a">Oui — le festival est tout public. Les initiations accueillent les enfants dès 8 ans accompagnés. Le show final comporte des effets lumineux et sonores soutenus ; des protections auditives sont disponibles à l'accueil.</div></details>
+          <details><summary>Que se passe-t-il à 16h ? <span class="x">+</span></summary><div class="a">« Arts martiaux &amp; cinéma » : projection d'extraits, analyse de scènes cultes image par image, puis démonstration sur scène des techniques derrière l'image. Un carton de séance vous est remis à l'entrée.</div></details>
+          <details><summary>Accessible PMR ? <span class="x">+</span></summary><div class="a">Oui — l'ensemble du parcours et de la salle est accessible. Des places dédiées sont réservées pour le show final : précisez-le par e-mail après votre commande.</div></details>
+        </div>
+
+        <div class="appfoot">
+          <div class="f-logo">CHONG<span class="cjkstack"><span>冲</span><span>击</span></span>JI</div>
+          <p>© 2026 Festival Chong Ji 冲击<br>Projet de diplôme — Viktor Guignard<br>M2 DA Graphique · ESDAC Paris<br>événement fictif</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TAB BAR -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-view="home">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg>
+      <span>Accueil</span>
+    </button>
+    <button class="tab" data-view="programme">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="19" cy="19" r="2"/></svg>
+      <span>Programme</span>
+    </button>
+    <button class="tab" data-view="billets">
+      <svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12"/></svg>
+      <span>Billets</span>
+    </button>
+    <button class="tab" data-view="wallet">
+      <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10h18M16 14h2"/></svg>
+      <span>Mes billets</span>
+      <span class="tb-badge" id="tab-wallet-badge">0</span>
+    </button>
+    <button class="tab" data-view="infos">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+      <span>Infos</span>
+    </button>
+  </nav>
+
+  <div id="toast" role="status"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const STORE='chongji_tickets_v1';
+
+/* ---- Splash ---- */
+const splash=$('#splash');
+setTimeout(()=>{splash.classList.add('gone');document.body.classList.add('booted');},reduced?200:1500);
+
+/* ---- Routeur de vues ---- */
+const views={home:$('#v-home'),programme:$('#v-programme'),billets:$('#v-billets'),wallet:$('#v-wallet'),infos:$('#v-infos')};
+const tabs=$$('.tab');
+const topbar=$('#topbar');
+let current='home';
+
+function go(name){
+  if(!views[name]||name===current)return;
+  views[current].classList.remove('active');
+  views[name].classList.add('active');
+  views[name].scrollTop=0;
+  current=name;
+  tabs.forEach(t=>t.classList.toggle('active',t.dataset.view===name));
+  // top bar : sombre sur home/programme/wallet, claire ailleurs ; titre sauf home
+  const dark=(name==='home'||name==='programme'||name==='wallet');
+  topbar.classList.toggle('dark',dark);
+  topbar.classList.toggle('titled',name!=='home');
+  $('#tb-title').textContent=views[name].dataset.title;
+  if(name==='wallet')renderWallet();
+  revealIn(views[name]);
+}
+tabs.forEach(t=>t.addEventListener('click',()=>go(t.dataset.view)));
+$$('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
+$('#goBillets').addEventListener('click',()=>go('billets'));
+$('#goWallet').addEventListener('click',()=>go('wallet'));
+$('#tb-logo').addEventListener('click',()=>go('home'));
+
+/* ---- Révélations ---- */
+function revealIn(root){
+  const els=[...root.querySelectorAll('.reveal:not(.in)')];
+  els.forEach((el,i)=>setTimeout(()=>el.classList.add('in'),60+i*70));
+  const g=root.querySelector('.gauge');if(g)setTimeout(()=>g.classList.add('in'),150);
+}
+revealIn(views.home);
+
+/* ---- Marquee ---- */
+(function(){
+  const items=['DÉMONSTRATIONS','INITIATIONS','PROJECTIONS','RENCONTRES','7 AOÛT 2026'];
+  const seq=items.map(t=>`<span>${t}</span><span class="dot">冲击</span>`).join('');
+  $('#mq1').innerHTML=seq+seq;
+})();
+
+/* ---- Titre hero ajusté à la largeur ---- */
+const heroTitle=$('.hero-title');
+function fitHero(){
+  if(!heroTitle)return;
+  heroTitle.style.fontSize='100px';
+  const k=heroTitle.children;
+  const w=k[k.length-1].getBoundingClientRect().right - k[0].getBoundingClientRect().left;
+  const avail=heroTitle.clientWidth;
+  if(w>0)heroTitle.style.fontSize=Math.max(40,Math.min(118,100*avail/w*0.96))+'px';
+}
+fitHero();
+addEventListener('resize',fitHero);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitHero);
+setTimeout(fitHero,600);setTimeout(fitHero,1600);
+
+/* ---- Compte à rebours ---- */
+const target=new Date('2026-08-07T10:00:00+02:00').getTime();
+function pad(n,l){return String(n).padStart(l,'0');}
+function cd(){
+  let d=target-Date.now();
+  if(d<=0){
+    const over=Date.now()>target+10*36e5;
+    $('#countdown').innerHTML=over
+      ? '<div style="text-align:center;width:100%"><b style="font-size:22px">MERCI — À L\'ANNÉE PROCHAINE</b><i>édition 2026 terminée</i></div>'
+      : '<div style="text-align:center;width:100%"><b style="font-size:26px;color:var(--red)">C\'EST AUJOURD\'HUI</b><i>portes 9h15 — Zénith Paris</i></div>';
+    clearInterval(cdTimer);return;
+  }
+  const j=Math.floor(d/864e5);d-=j*864e5;
+  const h=Math.floor(d/36e5);d-=h*36e5;
+  const m=Math.floor(d/6e4);d-=m*6e4;
+  const s=Math.floor(d/1e3);
+  $('#cd-d').textContent=pad(j,3);$('#cd-h').textContent=pad(h,2);
+  $('#cd-m').textContent=pad(m,2);$('#cd-s').textContent=pad(s,2);
+}
+cd();const cdTimer=setInterval(cd,1000);
+
+/* ---- FAQ accordéons ---- */
+$$('.faq summary').forEach(s=>{
+  s.addEventListener('click',e=>{
+    e.preventDefault();
+    const d=s.parentElement;const open=d.hasAttribute('open');
+    $$('.faq details').forEach(o=>{if(o!==d)o.removeAttribute('open');});
+    if(open)d.removeAttribute('open');else d.setAttribute('open','');
+  });
+});
+
+/* ---- Écran cinéma ---- */
+const frames=$$('#screen .frame'),fc=$('#frame-counter'),fdots=$$('#fdots button');
+let fi=0,ftimer;
+function showFrame(n){
+  frames[fi].classList.remove('on');fdots[fi].classList.remove('on');
+  fi=(n+frames.length)%frames.length;
+  frames[fi].classList.add('on');fdots[fi].classList.add('on');
+  fc.textContent=`SCÈNE ${pad(fi+1,2)} / 0${frames.length}`;
+}
+function autoFrames(){clearInterval(ftimer);ftimer=setInterval(()=>showFrame(fi+1),4200);}
+fdots.forEach((d,i)=>d.addEventListener('click',()=>{showFrame(i);autoFrames();}));
+$('#screen').addEventListener('click',()=>{showFrame(fi+1);autoFrames();});
+autoFrames();
+
+/* ---- Jour J : créneau en cours ---- */
+(function liveSlot(){
+  const now=new Date();
+  if(now.toDateString()!==new Date('2026-08-07T12:00:00+02:00').toDateString())return;
+  const hours=[10,11,12.5,14,16,18,20];
+  const hnow=now.getHours()+now.getMinutes()/60;
+  let idx=-1;hours.forEach((hh,i)=>{if(hnow>=hh)idx=i;});
+  if(idx<0)return;
+  const slot=$$('#timeline .slot')[idx];if(!slot)return;
+  const live=document.createElement('span');
+  live.className='live';live.innerHTML='<i></i>EN CE MOMENT';
+  slot.querySelector('h3').before(live);
+})();
+
+/* ---- Billetterie ---- */
+const CATALOG={
+  reduit:{name:'LA RELÈVE — tarif réduit',price:25,per:1},
+  plein:{name:'LA JOURNÉE — plein tarif',price:35,per:1},
+  tribu:{name:'LA TRIBU — pack 4 places',price:120,per:4},
+};
+const cart={reduit:0,plein:0,tribu:0};
+const linesEl=$('#lines'),totalEl=$('#total'),payBtn=$('#paybtn');
+
+$$('.tkt').forEach(card=>{
+  const id=card.dataset.id,out=card.querySelector('.qty b');
+  card.querySelectorAll('.qty button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      cart[id]=Math.min(8,Math.max(0,cart[id]+ +b.dataset.q));
+      out.textContent=cart[id];
+      renderCart();
+    });
+  });
+});
+function total(){return Object.keys(cart).reduce((t,k)=>t+cart[k]*CATALOG[k].price,0);}
+function seats(){return Object.keys(cart).reduce((t,k)=>t+cart[k]*CATALOG[k].per,0);}
+function renderCart(){
+  const rows=Object.keys(cart).filter(k=>cart[k]>0)
+    .map(k=>`<div class="row"><span>${cart[k]} × ${CATALOG[k].name}</span><span>${cart[k]*CATALOG[k].price} €</span></div>`);
+  linesEl.innerHTML=rows.length?rows.join(''):'<div class="empty">Aucun billet sélectionné — choisissez ci-dessus.</div>';
+  totalEl.textContent=total()+' €';
+  const n=seats();
+  $('#cart-badge').textContent=n;$('#cart-badge').classList.toggle('show',n>0);
+  validate();
+}
+function validate(){
+  const ok=total()>0 && $('#f-name').value.trim().length>1 && /.+@.+\..+/.test($('#f-mail').value);
+  payBtn.disabled=!ok;
+  payBtn.textContent= total()>0 ? `Payer ${total()} € — ${seats()} billet${seats()>1?'s':''}` : 'Payer — recevoir mes billets';
+}
+$('#f-name').addEventListener('input',validate);
+$('#f-mail').addEventListener('input',validate);
+
+/* ---- Génération ---- */
+const PORTES='ABCDEFG';
+function barcodeNum(){let s='';for(let i=0;i<4;i++)s+=pad(Math.floor(Math.random()*9000)+1000,4)+' ';return s.trim();}
+
+$('#payform').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(payBtn.disabled){
+    const f=$('#payform');f.classList.remove('err');void f.offsetWidth;f.classList.add('err');
+    return;
+  }
+  payBtn.textContent='Paiement en cours…';payBtn.disabled=true;
+  setTimeout(()=>{
+    const holder=$('#f-name').value.trim().toUpperCase();
+    const mail=$('#f-mail').value.trim();
+    const porte=PORTES[Math.floor(Math.random()*PORTES.length)];
+    const rang=Math.floor(Math.random()*22)+1;
+    let base=Math.floor(Math.random()*160)+1;
+    const lbls=[];
+    Object.keys(cart).forEach(k=>{for(let i=0;i<cart[k]*CATALOG[k].per;i++)lbls.push(k==='reduit'?'Tarif réduit · 1 entrée':k==='tribu'?'Pack tribu · 1 entrée':'Billet 1 entrée');});
+    const newTickets=[];
+    for(let i=0;i<seats();i++)
+      newTickets.push({holder,mail,label:lbls[i]||'Billet 1 entrée',porte,rang,place:base+i,code:barcodeNum(),ts:Date.now()});
+    saveTickets(newTickets);
+    // reset panier
+    Object.keys(cart).forEach(k=>cart[k]=0);
+    $$('.tkt .qty b').forEach(b=>b.textContent='0');
+    renderCart();
+    toast(`<b>${newTickets.length} billet${newTickets.length>1?'s':''}</b> ajouté${newTickets.length>1?'s':''} — confirmation envoyée à ${mail}`);
+    if(!reduced)flash();
+    go('wallet');
+  },1100);
+});
+
+/* ---- Stockage local ---- */
+function loadTickets(){try{return JSON.parse(localStorage.getItem(STORE)||'[]');}catch(e){return [];}}
+function persist(arr){try{localStorage.setItem(STORE,JSON.stringify(arr));}catch(e){}}
+function saveTickets(newOnes){const all=loadTickets().concat(newOnes);persist(all);updateBadges();}
+function updateBadges(){
+  const n=loadTickets().length;
+  ['#wallet-badge','#tab-wallet-badge'].forEach(sel=>{const el=$(sel);el.textContent=n;el.classList.toggle('show',n>0);});
+}
+
+/* ---- Brush SVG pour billet ---- */
+function brushSVG(){
+  const fid='d'+Math.random().toString(36).slice(2,7);
+  return `<svg class="bbrush" viewBox="0 0 300 120" preserveAspectRatio="none"><defs><filter id="${fid}" x="-20%" y="-50%" width="140%" height="200%"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.3" numOctaves="3" seed="${Math.floor(Math.random()*40)}" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="26"/></filter></defs><g filter="url(#${fid})"><path d="M10,80 C80,60 160,90 290,40" stroke="#C8141A" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M20,95 C100,80 180,100 290,60" stroke="#C8141A" stroke-width="7" fill="none" stroke-linecap="round" opacity=".8"/></g></svg>`;
+}
+function ticketHTML(t,idx){
+  const grad=`repeating-linear-gradient(to right,#C8141A 0 ${1+Math.random()*2|0}px,transparent ${2+Math.random()*2|0}px ${4+Math.random()*2|0}px)`;
+  return `<div class="bticket" data-idx="${idx}">
+    <div class="main">${brushSVG()}
+      <div class="blogo">CHONG<span class="cjkstack"><span>冲</span><span>击</span></span>JI</div>
+      <div class="bbase">Des arts martiaux au 7e art · ${t.label}</div>
+      <div class="grid">
+        <div class="cell"><span>Porteur</span><b>${t.holder}</b></div>
+        <div class="cell"><span>Date</span><b>07 / 08 / 26</b></div>
+        <div class="cell"><span>Lieu</span><b>ZÉNITH PARIS</b></div>
+        <div class="cell"><span>Horaire</span><b>10H — 20H</b></div>
+        <div class="cell full"><span>Accès show final</span><b>PORTE ${t.porte} · RANG ${t.rang} · PLACE ${t.place}</b></div>
+      </div>
+      <div class="footer"><span>⊘ Billet non échangeable</span><span>🔒 Conservez ce billet jusqu'à la fin de l'événement</span></div>
+    </div>
+    <div class="stub">
+      <div>
+        <div class="holder">${t.holder}</div>
+        <div class="num">CHONGJI · 2026 · ${t.code}</div>
+      </div>
+      <div class="barcode" style="background:${grad}"></div>
+    </div>
+  </div>
+  <div class="tkt-actions">
+    <button data-act="png" data-idx="${idx}">↓ PNG</button>
+    <button data-act="ics" data-idx="${idx}">+ Agenda</button>
+    <button class="danger" data-act="del" data-idx="${idx}">✕ Retirer</button>
+  </div>`;
+}
+function renderWallet(){
+  const tickets=loadTickets();
+  const wrap=$('#wallet-content');
+  if(!tickets.length){
+    wrap.innerHTML=`<div class="wallet-empty">
+      <div class="glyph">空</div>
+      <h3>Aucun billet pour l'instant</h3>
+      <p>Vos billets nominatifs apparaîtront ici, accessibles hors-ligne le jour J.</p>
+      <button class="btn" data-goto="billets" style="max-width:280px">Prendre mes billets</button>
+    </div>`;
+    wrap.querySelector('[data-goto]').addEventListener('click',()=>go('billets'));
+    return;
+  }
+  let html=`<div class="sec-head"><span class="num">·</span><h2>Mes billets.</h2><p class="sub">${tickets.length} billet${tickets.length>1?'s':''} · présentez-les à l'entrée</p></div><div class="wallet-list">`;
+  tickets.forEach((t,i)=>html+=ticketHTML(t,i));
+  html+=`</div><div style="margin-top:24px"><button class="btn ghost" id="clear-all">Vider mes billets</button></div>`;
+  wrap.innerHTML=html;
+  // actions
+  wrap.querySelectorAll('.tkt-actions button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const idx=+b.dataset.idx,act=b.dataset.act,arr=loadTickets();
+      if(act==='del'){arr.splice(idx,1);persist(arr);updateBadges();renderWallet();toast('Billet retiré');}
+      else if(act==='png'){downloadPNG(arr[idx]);}
+      else if(act==='ics'){downloadICS();}
+    });
+  });
+  const clr=$('#clear-all');
+  if(clr)clr.addEventListener('click',()=>{
+    if(confirm('Retirer tous vos billets de cet appareil ?')){persist([]);updateBadges();renderWallet();toast('Billets vidés');}
+  });
+}
+
+/* ---- Billet PNG (vertical) ---- */
+function downloadPNG(t){
+  const W=820,H=1320,c=document.createElement('canvas');c.width=W;c.height=H;
+  const x=c.getContext('2d');
+  x.fillStyle='#F2EFE6';x.fillRect(0,0,W,H);
+  x.save();x.beginPath();x.rect(0,0,W,280);x.clip();x.translate(40,140);x.rotate(-0.07);
+  for(let i=0;i<42;i++){const yy=(Math.random()-0.5)*70,ln=180+Math.random()*420;
+    x.globalAlpha=0.25+Math.random()*0.75;x.fillStyle='#C8141A';x.fillRect(Math.random()*160,yy,ln,2+Math.random()*8);}
+  x.restore();x.globalAlpha=1;
+  x.fillStyle='#0A0A0B';x.font="74px 'Archivo Black','Arial Black',sans-serif";x.fillText('CHONG',54,390);
+  const wC=x.measureText('CHONG').width;
+  x.font="900 34px 'Noto Sans SC',sans-serif";x.fillStyle='#C8141A';
+  x.fillText('冲',54+wC+18,360);x.fillText('击',54+wC+18,396);
+  x.font="74px 'Archivo Black','Arial Black',sans-serif";x.fillStyle='#0A0A0B';x.fillText('JI',54+wC+70,390);
+  x.font="500 16px 'IBM Plex Mono',monospace";x.fillStyle='#C8141A';x.fillText('DES ARTS MARTIAUX AU 7E ART',56,436);
+  x.fillStyle='#8A857B';x.fillText(t.label.toUpperCase(),56,462);
+  const rows=[['PORTEUR',t.holder],['DATE','VENDREDI 07 / 08 / 2026 · 10H—20H'],['LIEU','ZÉNITH PARIS – LA VILLETTE'],['ACCÈS SHOW FINAL',`PORTE ${t.porte} · RANG ${t.rang} · PLACE ${t.place}`]];
+  let yy=550;
+  rows.forEach(r=>{
+    x.font="500 16px 'IBM Plex Mono',monospace";x.fillStyle='#C8141A';x.fillText(r[0],56,yy);
+    x.font="32px 'Archivo Black','Arial Black',sans-serif";x.fillStyle='#0A0A0B';x.fillText(r[1],56,yy+42);
+    yy+=120;
+  });
+  x.fillStyle='#0A0A0B';x.fillRect(56,yy,W-112,52);
+  x.font="500 14px 'IBM Plex Mono',monospace";x.fillStyle='#F2EFE6';
+  x.fillText('⊘ NON ÉCHANGEABLE · 🔒 À CONSERVER JUSQU\'À LA FIN',76,yy+33);
+  yy+=104;
+  x.setLineDash([9,9]);x.strokeStyle='rgba(10,10,11,.4)';x.lineWidth=3;
+  x.beginPath();x.moveTo(40,yy);x.lineTo(W-40,yy);x.stroke();x.setLineDash([]);
+  let bx=70;while(bx<W-70){const bw=2+Math.random()*6;x.fillStyle='#C8141A';x.fillRect(bx,yy+50,bw,160);bx+=bw+3+Math.random()*5;}
+  x.font="500 16px 'IBM Plex Mono',monospace";x.fillStyle='#8A857B';
+  x.fillText(t.code,70,yy+250);x.fillText('CHONGJI 冲击 · 2026',W-250,yy+250);
+  const a=document.createElement('a');
+  a.download=`CHONGJI_billet_${t.holder.replaceAll(' ','-')}_P${t.place}.png`;
+  a.href=c.toDataURL('image/png');a.click();
+  toast('Billet téléchargé');
+}
+
+/* ---- ICS ---- */
+function downloadICS(){
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//CHONGJI//FR','BEGIN:VEVENT',
+    'UID:chongji-2026@chongji-festival.fr','DTSTAMP:20260601T000000Z',
+    'DTSTART:20260807T080000Z','DTEND:20260807T180000Z',
+    'SUMMARY:Festival CHONG JI 冲击 — Des arts martiaux au 7e art',
+    'LOCATION:Zénith Paris – La Villette\\, 211 avenue Jean-Jaurès\\, 75019 Paris',
+    'DESCRIPTION:Démonstrations · initiations · projections · rencontres. Présentez votre billet à l\'entrée.',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a=document.createElement('a');
+  a.download='CHONGJI_7aout2026.ics';
+  a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);a.click();
+  toast('Événement ajouté au calendrier');
+}
+
+/* ---- Toast ---- */
+let toastT;
+function toast(html){
+  const el=$('#toast');el.innerHTML=html;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3200);
+}
+/* ---- Flash impact ---- */
+function flash(){
+  const fl=document.createElement('div');fl.id='flash';fl.innerHTML='<b>冲击</b>';
+  $('#app').appendChild(fl);setTimeout(()=>fl.remove(),1100);
+}
+
+/* ---- init ---- */
+renderCart();updateBadges();
+})();
+</script>
+</body>
+</html>
