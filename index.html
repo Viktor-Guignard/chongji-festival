@@ -331,25 +331,54 @@ input,textarea{font-family:inherit}
 .co-form.err{animation:shake .45s}
 
 /* ============ BILLET (wallet) ============ */
-.bticket{background:var(--bone);color:var(--ink);position:relative;display:flex;flex-direction:column;
-  box-shadow:0 18px 44px rgba(10,10,11,.4);animation:tin .6s var(--ease-snap)}
-@keyframes tin{from{opacity:0;transform:translateY(28px)}}
-.bticket .main{padding:22px 22px 18px;position:relative;overflow:hidden}
-.bticket .main>*:not(.bbrush){position:relative;z-index:1}
-.bticket .bbrush{position:absolute;right:-30px;top:-30px;width:240px;height:90px;opacity:.9;pointer-events:none;z-index:0}
-.bticket .blogo{display:flex;align-items:baseline;gap:.3em;font-family:var(--display);font-size:24px}
-.bticket .bbase{font-family:var(--mono);font-size:8.5px;letter-spacing:.26em;color:var(--red);text-transform:uppercase;margin:5px 0 18px;line-height:1.5}
-.bticket .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
-.bticket .cell.full{grid-column:1 / -1}
-.bticket .cell span{display:block;font-family:var(--mono);font-size:8px;letter-spacing:.24em;color:var(--red);text-transform:uppercase;margin-bottom:4px}
-.bticket .cell b{font-family:var(--display);font-weight:400;font-size:15px;letter-spacing:.02em}
-.bticket .footer{margin-top:18px;background:var(--ink);color:var(--bone);font-family:var(--mono);font-size:8px;letter-spacing:.16em;
-  padding:9px 12px;display:flex;flex-direction:column;gap:4px;text-transform:uppercase}
-.bticket .stub{border-top:2px dashed rgba(10,10,11,.35);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative}
-.bticket .stub::before,.bticket .stub::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:inherit;top:-11px;z-index:2}
-.bticket .stub .holder{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--red)}
-.bticket .stub .num{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--grey);margin-top:3px}
-.barcode{height:54px;flex:none;width:46%}
+/* ===== Billet à souche détachable (repris du système CHONG JI) ===== */
+.tk{position:relative;display:flex;align-items:stretch;width:100%;transform-style:preserve-3d;
+  transform:rotateX(6deg) rotateY(-7deg);transition:transform .55s var(--ease-snap);will-change:transform;
+  filter:drop-shadow(0 24px 38px rgba(10,10,11,.5));animation:tin .6s var(--ease-snap)}
+@keyframes tin{from{opacity:0;transform:translateY(26px) rotateX(6deg) rotateY(-7deg)}}
+.tk.flat{transform:none}
+.tk-body{flex:1 1 auto;min-width:0;position:relative;background:var(--bone);color:var(--ink);
+  padding:20px 20px 16px;overflow:hidden;outline:1px solid rgba(13,13,13,.06)}
+.tk-body>*:not(.bbrush):not(.edge){position:relative;z-index:1}
+.bbrush{position:absolute;right:-26px;top:-26px;width:220px;height:84px;opacity:.9;pointer-events:none;z-index:0}
+.blogo{display:flex;align-items:baseline;gap:.3em;font-family:var(--display);font-size:22px}
+.bbase{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;color:var(--red);text-transform:uppercase;margin:5px 0 16px;line-height:1.5}
+.tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px 12px}
+.tk-grid .cell.full{grid-column:1 / -1}
+.tk-grid .cell span{display:block;font-family:var(--mono);font-size:8px;letter-spacing:.22em;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.tk-grid .cell b{font-family:var(--display);font-weight:400;font-size:14px;letter-spacing:.02em}
+.tk-foot{margin-top:16px;background:var(--ink);color:var(--bone);font-family:var(--mono);font-size:8px;letter-spacing:.14em;
+  padding:9px 11px;display:flex;flex-direction:column;gap:4px;text-transform:uppercase}
+/* perforation à encoches */
+.tk-perf{flex:0 0 3px;align-self:stretch;position:relative;z-index:3;
+  background:repeating-linear-gradient(to bottom,rgba(13,13,13,.5) 0 5px,transparent 5px 10px);transition:opacity .25s}
+.tk-perf::before,.tk-perf::after{content:'';position:absolute;left:50%;width:13px;height:13px;border-radius:50%;
+  background:var(--ink-2);transform:translate(-50%,-50%);z-index:4}
+.tk-perf::before{top:0}.tk-perf::after{top:auto;bottom:0;transform:translate(-50%,50%)}
+/* souche */
+.tk-stub{flex:0 0 27%;position:relative;z-index:2;background:var(--bone);color:var(--ink);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:9px;padding:16px 9px;text-align:center;
+  transition:transform .7s var(--ease-hit),box-shadow .6s;transform-origin:left center;outline:1px solid rgba(13,13,13,.05)}
+.tk-stub .holder{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);line-height:1.4;word-break:break-word}
+.tk-stub .barcode{width:100%;flex:1;min-height:64px;background:repeating-linear-gradient(to bottom,var(--red) 0 2px,transparent 2px 4px)}
+.tk-stub .snum{font-family:var(--mono);font-size:7px;letter-spacing:.05em;color:var(--grey)}
+/* bords crantés révélés à la déchirure */
+.edge{position:absolute;top:-1px;bottom:-1px;width:9px;z-index:5;pointer-events:none;background-repeat:repeat-y;background-size:9px 12px;opacity:0;transition:opacity .1s}
+.edge-body{right:-8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='12'%3E%3Cpath d='M0 0H3L9 6L3 12H0Z' fill='%23F2EFE6'/%3E%3Cpath d='M3 0L9 6L3 12' fill='none' stroke='%230D0D0D' stroke-opacity='.2' stroke-width='.7'/%3E%3C/svg%3E")}
+.edge-stub{left:-8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='12'%3E%3Cpath d='M9 0H6L0 6L6 12H9Z' fill='%23F2EFE6'/%3E%3Cpath d='M6 0L0 6L6 12' fill='none' stroke='%230D0D0D' stroke-opacity='.2' stroke-width='.7'/%3E%3C/svg%3E")}
+.tk.torn .edge{opacity:1}
+.tk.torn .tk-perf{opacity:0}
+.tk.torn .tk-stub{transform:translate(13px,15px) rotate(5deg);box-shadow:0 22px 38px -18px rgba(0,0,0,.6)}
+/* poussière de déchirure */
+.tk-dust{position:absolute;top:0;bottom:0;left:73%;width:2px;z-index:6;pointer-events:none}
+.tk.torn .tk-dust i{animation:dust .6s var(--ease-hit) forwards}
+.tk-dust i{position:absolute;width:5px;height:5px;background:var(--bone);border-radius:50%;opacity:0;box-shadow:0 0 0 1px rgba(13,13,13,.18)}
+@keyframes dust{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+/* reflet */
+.tk-gloss{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.4;z-index:4;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.5) 48%,transparent 58%);background-size:260% 100%;background-position:120% 0;
+  transition:background-position .6s var(--ease-snap),opacity .3s}
+.tk.lit .tk-gloss,.tk:hover .tk-gloss{background-position:-40% 0;opacity:.6}
 
 /* wallet view */
 #v-wallet{background:var(--ink-2);color:var(--bone)}
@@ -357,8 +386,9 @@ input,textarea{font-family:inherit}
 .wallet-empty .glyph{font-family:var(--cjk);font-weight:900;font-size:80px;color:var(--red);opacity:.5;line-height:1}
 .wallet-empty h3{font-family:var(--display);font-size:24px;color:var(--bone)}
 .wallet-empty p{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--grey);text-transform:uppercase;line-height:1.7;max-width:30ch}
-.wallet-list{display:flex;flex-direction:column;gap:20px}
-.tkt-actions{display:flex;gap:9px;margin-top:12px}
+.wallet-list{display:flex;flex-direction:column;gap:40px}
+.tk-card{display:flex;flex-direction:column;gap:28px;perspective:1500px}
+.tkt-actions{display:flex;gap:9px}
 .tkt-actions button{flex:1;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--bone);
   border:1px solid rgba(242,239,230,.4);padding:11px 8px;background:transparent;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .2s,color .2s}
 .tkt-actions button:active{background:var(--bone);color:var(--ink)}
@@ -450,6 +480,8 @@ input,textarea{font-family:inherit}
 #app[data-theme="light"] .master h3{color:var(--ink)}
 #app[data-theme="light"] .master .glyph{color:var(--ink);opacity:.1}
 /* wallet */
+#app[data-theme="light"] .tk-perf::before,#app[data-theme="light"] .tk-perf::after{background:var(--bone-2)}
+#app[data-theme="light"] .tk{filter:drop-shadow(0 20px 34px rgba(10,10,11,.22))}
 #app[data-theme="light"] .wallet-empty h3{color:var(--ink)}
 #app[data-theme="light"] .tkt-actions button{color:var(--ink);border-color:rgba(10,10,11,.4)}
 #app[data-theme="light"] .tkt-actions button:active{background:var(--ink);color:var(--bone)}
@@ -1062,6 +1094,7 @@ $('#payform').addEventListener('submit',e=>{
     // reset panier
     Object.keys(cart).forEach(k=>{cart[k]=0;syncCard(k);});
     renderCart();
+    freshCount=newTickets.length;
     toast(`<b>${newTickets.length} billet${newTickets.length>1?'s':''}</b> ajouté${newTickets.length>1?'s':''} — confirmation envoyée à ${mail}`);
     if(!reduced)flash();
     go('wallet');
@@ -1083,34 +1116,57 @@ function brushSVG(){
   return `<svg class="bbrush" viewBox="0 0 300 120" preserveAspectRatio="none"><defs><filter id="${fid}" x="-20%" y="-50%" width="140%" height="200%"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.3" numOctaves="3" seed="${Math.floor(Math.random()*40)}" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="26"/></filter></defs><g filter="url(#${fid})"><path d="M10,80 C80,60 160,90 290,40" stroke="#C8141A" stroke-width="24" fill="none" stroke-linecap="round"/><path d="M20,95 C100,80 180,100 290,60" stroke="#C8141A" stroke-width="7" fill="none" stroke-linecap="round" opacity=".8"/></g></svg>`;
 }
 function ticketHTML(t,idx){
-  const grad=`repeating-linear-gradient(to right,#C8141A 0 ${1+Math.random()*2|0}px,transparent ${2+Math.random()*2|0}px ${4+Math.random()*2|0}px)`;
-  return `<div class="bticket" data-idx="${idx}">
-    <div class="main">${brushSVG()}
-      <div class="blogo">CHONG<span class="cjkstack"><span>冲</span><span>击</span></span>JI</div>
-      <div class="bbase">Des arts martiaux au 7e art · ${t.label}</div>
-      <div class="grid">
-        <div class="cell"><span>Porteur</span><b>${t.holder}</b></div>
-        <div class="cell"><span>Date</span><b>07 / 08 / 26</b></div>
-        <div class="cell"><span>Lieu</span><b>ZÉNITH PARIS</b></div>
-        <div class="cell"><span>Horaire</span><b>10H — 20H</b></div>
-        <div class="cell full"><span>Accès show final</span><b>PORTE ${t.porte} · RANG ${t.rang} · PLACE ${t.place}</b></div>
+  return `<div class="tk-card">
+    <figure class="tk" data-idx="${idx}" aria-label="Billet CHONG JI au nom de ${t.holder}, souche détachable">
+      <div class="tk-body">${brushSVG()}
+        <div class="blogo">CHONG<span class="cjkstack"><span>冲</span><span>击</span></span>JI</div>
+        <div class="bbase">Des arts martiaux au 7e art · ${t.label}</div>
+        <div class="tk-grid">
+          <div class="cell"><span>Porteur</span><b>${t.holder}</b></div>
+          <div class="cell"><span>Date</span><b>07 / 08 / 26</b></div>
+          <div class="cell"><span>Lieu</span><b>ZÉNITH PARIS</b></div>
+          <div class="cell"><span>Horaire</span><b>10H — 20H</b></div>
+          <div class="cell full"><span>Accès show final</span><b>PORTE ${t.porte} · RANG ${t.rang} · PLACE ${t.place}</b></div>
+        </div>
+        <div class="tk-foot"><span>⊘ Billet non échangeable</span><span>🔒 À conserver jusqu'à la fin de l'événement</span></div>
+        <span class="edge edge-body" aria-hidden="true"></span>
       </div>
-      <div class="footer"><span>⊘ Billet non échangeable</span><span>🔒 Conservez ce billet jusqu'à la fin de l'événement</span></div>
-    </div>
-    <div class="stub">
-      <div>
+      <span class="tk-perf" aria-hidden="true"></span>
+      <div class="tk-stub" role="button" tabindex="0" aria-label="Détacher la souche">
+        <span class="edge edge-stub" aria-hidden="true"></span>
         <div class="holder">${t.holder}</div>
-        <div class="num">CHONGJI · 2026 · ${t.code}</div>
+        <div class="barcode"></div>
+        <div class="snum">${t.code}</div>
       </div>
-      <div class="barcode" style="background:${grad}"></div>
+      <span class="tk-dust" aria-hidden="true"></span>
+      <span class="tk-gloss" aria-hidden="true"></span>
+    </figure>
+    <div class="tkt-actions">
+      <button data-act="png" data-idx="${idx}">↓ PNG</button>
+      <button data-act="ics" data-idx="${idx}">+ Agenda</button>
+      <button class="danger" data-act="del" data-idx="${idx}">✕ Retirer</button>
     </div>
-  </div>
-  <div class="tkt-actions">
-    <button data-act="png" data-idx="${idx}">↓ PNG</button>
-    <button data-act="ics" data-idx="${idx}">+ Agenda</button>
-    <button class="danger" data-act="del" data-idx="${idx}">✕ Retirer</button>
   </div>`;
 }
+/* poussière de déchirure */
+function spawnDust(tk){
+  if(reduced)return;
+  const d=tk.querySelector('.tk-dust');if(!d)return;
+  d.innerHTML='';
+  for(let k=0;k<13;k++){
+    const i=document.createElement('i');
+    i.style.top=(6+Math.random()*88)+'%';
+    i.style.setProperty('--dx',(8+Math.random()*30)+'px');
+    i.style.setProperty('--dy',(Math.random()*40-6)+'px');
+    d.appendChild(i);
+  }
+}
+function tearTicket(tk,on){
+  const torn = on===undefined ? !tk.classList.contains('torn') : on;
+  tk.classList.toggle('torn',torn);
+  if(torn)spawnDust(tk);
+}
+let freshCount=0;
 function renderWallet(){
   const tickets=loadTickets();
   const wrap=$('#wallet-content');
@@ -1124,10 +1180,18 @@ function renderWallet(){
     wrap.querySelector('[data-goto]').addEventListener('click',()=>go('billets'));
     return;
   }
-  let html=`<div class="sec-head"><span class="num">·</span><h2>Mes billets.</h2><p class="sub">${tickets.length} billet${tickets.length>1?'s':''} · présentez-les à l'entrée</p></div><div class="wallet-list">`;
-  tickets.forEach((t,i)=>html+=ticketHTML(t,i));
-  html+=`</div><div style="margin-top:24px"><button class="btn ghost" id="clear-all">Vider mes billets</button></div>`;
+  let html=`<div class="sec-head"><span class="num">·</span><h2>Mes billets.</h2><p class="sub">${tickets.length} billet${tickets.length>1?'s':''} · touchez la souche pour la détacher</p></div><div class="wallet-list">`;
+  // billets les plus récents en premier
+  tickets.map((t,i)=>({t,i})).reverse().forEach(o=>html+=ticketHTML(o.t,o.i));
+  html+=`</div><div style="margin-top:26px"><button class="btn ghost" id="clear-all">Vider mes billets</button></div>`;
   wrap.innerHTML=html;
+  // souche détachable + mise à plat
+  wrap.querySelectorAll('.tk').forEach(tk=>{
+    const stub=tk.querySelector('.tk-stub');
+    stub.addEventListener('click',e=>{e.stopPropagation();tearTicket(tk);});
+    stub.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tearTicket(tk);}});
+    tk.querySelector('.tk-body').addEventListener('click',()=>tk.classList.toggle('flat'));
+  });
   // actions
   wrap.querySelectorAll('.tkt-actions button').forEach(b=>{
     b.addEventListener('click',()=>{
@@ -1141,6 +1205,18 @@ function renderWallet(){
   if(clr)clr.addEventListener('click',()=>{
     if(confirm('Retirer tous vos billets de cet appareil ?')){persist([]);updateBadges();renderWallet();toast('Billets vidés');}
   });
+  // déchirure automatique des billets fraîchement achetés
+  if(freshCount>0){
+    const total=tickets.length;
+    for(let i=total-freshCount;i<total;i++){
+      const tk=wrap.querySelector('.tk[data-idx="'+i+'"]');
+      if(!tk)continue;
+      tk.classList.add('lit');
+      const delay=600+(total-1-i)*280; // le plus récent (en haut) se déchire en premier
+      setTimeout(()=>{tearTicket(tk,true);tk.classList.remove('lit');},reduced?0:delay);
+    }
+    freshCount=0;
+  }
 }
 
 /* ---- Billet PNG (vertical) ---- */
