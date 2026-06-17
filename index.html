@@ -63,11 +63,11 @@ input,textarea{font-family:inherit}
   box-shadow:0 0 0 1px rgba(0,0,0,.06)}
 
 /* ---- logo bilingue ---- */
-.cjkstack{display:inline-flex;flex-direction:column;align-items:center;
+.cjkstack{display:inline-flex;flex-direction:row;align-items:baseline;
   font-family:var(--cjk);font-weight:900;color:var(--red);
-  font-size:var(--cjk-size,.375em);line-height:1.02;transform:translateY(var(--cjk-lift,-1.05em));
-  letter-spacing:0}
-.cjkstack span{display:block}
+  font-size:var(--cjk-size,.42em);line-height:1;transform:translateY(-.04em);
+  letter-spacing:0;margin:0 .05em}
+.cjkstack span{display:inline-block}
 
 .tag{font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;font-weight:500}
 .tag.red{color:var(--red)}
@@ -94,8 +94,6 @@ input,textarea{font-family:inherit}
   border-bottom:1px solid rgba(10,10,11,.08);transition:background .3s,color .3s,border-color .3s}
 .topbar.dark{background:var(--ink);color:var(--bone);border-color:rgba(242,239,230,.12)}
 .topbar .tb-logo{display:flex;align-items:center;gap:.28em;font-family:var(--display);font-size:18px;letter-spacing:.01em}
-.topbar .tb-logo .cjkstack{transform:none}
-.appfoot .f-logo .cjkstack{transform:none}
 .topbar .tb-title{font-family:var(--display);font-size:18px;letter-spacing:.01em;opacity:0;transform:translateY(8px);
   position:absolute;left:18px;transition:opacity .35s var(--ease-snap),transform .35s var(--ease-snap);pointer-events:none}
 .topbar.titled .tb-logo{opacity:0}
@@ -347,7 +345,9 @@ input,textarea{font-family:inherit}
 .tk-stub{flex:0 0 22%;position:relative;z-index:2;background:#efeae4;color:var(--ink);cursor:pointer;overflow:hidden;
   display:flex;align-items:stretch;justify-content:center;padding:11px 4px;
   transition:transform .7s var(--ease-hit),box-shadow .6s;transform-origin:left center}
-.tk-stub .barcode{flex:0 0 34%;align-self:stretch;background:repeating-linear-gradient(to bottom,#C8141A 0 2px,transparent 2px 4px)}
+.tk-stub .barcode{flex:0 0 34%;align-self:stretch;margin-bottom:12%;background:repeating-linear-gradient(to bottom,#C8141A 0 2px,transparent 2px 4px)}
+/* prolongement du bandeau noir du corps sur la souche (continuité) */
+.tk-stub::after{content:'';position:absolute;left:0;right:0;bottom:0;height:11.9%;background:#0a0a0b;z-index:3}
 .tk-stub .holder{position:absolute;left:5px;top:0;bottom:0;writing-mode:vertical-rl;transform:rotate(180deg);
   display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:7px;letter-spacing:.18em;
   text-transform:uppercase;color:#C8141A;white-space:nowrap}
