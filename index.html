@@ -93,7 +93,9 @@ input,textarea{font-family:inherit}
   background:var(--bone);position:relative;z-index:50;flex:none;
   border-bottom:1px solid rgba(10,10,11,.08);transition:background .3s,color .3s,border-color .3s}
 .topbar.dark{background:var(--ink);color:var(--bone);border-color:rgba(242,239,230,.12)}
-.topbar .tb-logo{display:flex;align-items:baseline;gap:.28em;font-family:var(--display);font-size:18px;letter-spacing:.01em}
+.topbar .tb-logo{display:flex;align-items:center;gap:.28em;font-family:var(--display);font-size:18px;letter-spacing:.01em}
+.topbar .tb-logo .cjkstack{transform:none}
+.appfoot .f-logo .cjkstack{transform:none}
 .topbar .tb-title{font-family:var(--display);font-size:18px;letter-spacing:.01em;opacity:0;transform:translateY(8px);
   position:absolute;left:18px;transition:opacity .35s var(--ease-snap),transform .35s var(--ease-snap);pointer-events:none}
 .topbar.titled .tb-logo{opacity:0}
@@ -337,20 +339,14 @@ input,textarea{font-family:inherit}
   filter:drop-shadow(0 24px 38px rgba(10,10,11,.5));animation:tin .6s var(--ease-snap)}
 @keyframes tin{from{opacity:0;transform:translateY(26px) rotateX(6deg) rotateY(-7deg)}}
 .tk.flat{transform:none}
-.tk-body{flex:1 1 auto;min-width:0;position:relative;container-type:inline-size;line-height:0;outline:1px solid rgba(13,13,13,.06)}
+.tk-body{flex:1 1 auto;min-width:0;position:relative;container-type:inline-size;line-height:0}
 .tk-body .tk-bg{width:100%;height:auto;display:block}
 .tk-acces{position:absolute;left:5.3%;top:77%;line-height:1;font-family:var(--display);color:#0D0D0D;
   font-size:2.44cqw;letter-spacing:.004em;white-space:nowrap;z-index:1}
-/* perforation à encoches */
-.tk-perf{flex:0 0 3px;align-self:stretch;position:relative;z-index:3;
-  background:repeating-linear-gradient(to bottom,rgba(13,13,13,.5) 0 5px,transparent 5px 10px);transition:opacity .25s}
-.tk-perf::before,.tk-perf::after{content:'';position:absolute;left:50%;width:13px;height:13px;border-radius:50%;
-  background:var(--ink-2);transform:translate(-50%,-50%);z-index:4}
-.tk-perf::before{top:0}.tk-perf::after{top:auto;bottom:0;transform:translate(-50%,50%)}
-/* souche reconstruite (style image) */
-.tk-stub{flex:0 0 22%;position:relative;z-index:2;background:#fdfcf9;color:var(--ink);cursor:pointer;overflow:hidden;
+/* souche reconstruite (style image) — collée au corps, sans séparation */
+.tk-stub{flex:0 0 22%;position:relative;z-index:2;background:#efeae4;color:var(--ink);cursor:pointer;overflow:hidden;
   display:flex;align-items:stretch;justify-content:center;padding:11px 4px;
-  transition:transform .7s var(--ease-hit),box-shadow .6s;transform-origin:left center;outline:1px solid rgba(13,13,13,.05)}
+  transition:transform .7s var(--ease-hit),box-shadow .6s;transform-origin:left center}
 .tk-stub .barcode{flex:0 0 34%;align-self:stretch;background:repeating-linear-gradient(to bottom,#C8141A 0 2px,transparent 2px 4px)}
 .tk-stub .holder{position:absolute;left:5px;top:0;bottom:0;writing-mode:vertical-rl;transform:rotate(180deg);
   display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:7px;letter-spacing:.18em;
@@ -360,9 +356,8 @@ input,textarea{font-family:inherit}
 /* bords crantés révélés à la déchirure */
 .edge{position:absolute;top:-1px;bottom:-1px;width:9px;z-index:5;pointer-events:none;background-repeat:repeat-y;background-size:9px 12px;opacity:0;transition:opacity .1s}
 .edge-body{right:-8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='12'%3E%3Cpath d='M0 0H3L9 6L3 12H0Z' fill='%23F2EFE6'/%3E%3Cpath d='M3 0L9 6L3 12' fill='none' stroke='%230D0D0D' stroke-opacity='.2' stroke-width='.7'/%3E%3C/svg%3E")}
-.edge-stub{left:-8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='12'%3E%3Cpath d='M9 0H6L0 6L6 12H9Z' fill='%23FDFCF9'/%3E%3Cpath d='M6 0L0 6L6 12' fill='none' stroke='%230D0D0D' stroke-opacity='.2' stroke-width='.7'/%3E%3C/svg%3E")}
+.edge-stub{left:-8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='12'%3E%3Cpath d='M9 0H6L0 6L6 12H9Z' fill='%23EFEAE4'/%3E%3Cpath d='M6 0L0 6L6 12' fill='none' stroke='%230D0D0D' stroke-opacity='.2' stroke-width='.7'/%3E%3C/svg%3E")}
 .tk.torn .edge{opacity:1}
-.tk.torn .tk-perf{opacity:0}
 .tk.torn .tk-stub{transform:translate(13px,15px) rotate(5deg);box-shadow:0 22px 38px -18px rgba(0,0,0,.6)}
 /* poussière de déchirure */
 .tk-dust{position:absolute;top:0;bottom:0;left:73%;width:2px;z-index:6;pointer-events:none}
@@ -410,7 +405,7 @@ input,textarea{font-family:inherit}
 
 /* footer mini */
 .appfoot{padding:30px 20px calc(var(--tabbar-h));text-align:center;border-top:1px solid rgba(10,10,11,.1);margin-top:10px}
-.appfoot .f-logo{font-family:var(--display);font-size:26px;display:inline-flex;align-items:baseline;gap:.3em;margin-bottom:12px}
+.appfoot .f-logo{font-family:var(--display);font-size:26px;display:inline-flex;align-items:center;gap:.3em;margin-bottom:12px}
 .appfoot p{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--grey);text-transform:uppercase;line-height:1.8}
 .foot-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:18px 0 22px}
 .foot-nav button{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);
@@ -1120,7 +1115,6 @@ function ticketHTML(t,idx){
         <div class="tk-acces">PORTE ${t.porte} · RANG ${t.rang} · PLACE ${t.place}</div>
         <span class="edge edge-body" aria-hidden="true"></span>
       </div>
-      <span class="tk-perf" aria-hidden="true"></span>
       <div class="tk-stub" role="button" tabindex="0" aria-label="Détacher la souche">
         <span class="edge edge-stub" aria-hidden="true"></span>
         <div class="holder">${t.holder}</div>
